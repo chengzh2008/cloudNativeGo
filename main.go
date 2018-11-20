@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	confPath := flag.String("conf", `./lib/configuration/config.json`, "flag to set the path to the configuration json file")
+	confPath := flag.String("conf", `./eventsservice/lib/configuration/config.json`, "flag to set the path to the configuration json file")
 	flag.Parse()
 	config, _ := configuration.ExtractConfiguration(*confPath)
 	fmt.Println("Connecting to database")
@@ -19,5 +19,11 @@ func main() {
 		fmt.Println("something erro happened during data connection")
 		return
 	}
-	log.Fatal(rest.ServeAPI(config.RestfulEndpoint, dbhandler))
+	httpErrChan, httpTLSErrChan := rest.ServeAPI(config.RestfulEndpoint, config.RestfulTLSEndpoint, dbhandler)
+	select {
+	case err := <-httpErrChan:
+		log.Fatal("HTTP error: ", err)
+	case err := <- httpTLSErrChan:
+		log.Fatal("HTTPS error: ", err)
+	}
 }

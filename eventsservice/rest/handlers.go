@@ -74,6 +74,7 @@ func (esh *eventServicesHandler) NewEventHandler(w http.ResponseWriter, r *http.
 	err := json.NewDecoder(r.Body).Decode(&event)
 	if err != nil {
 		w.WriteHeader(500)
+
 		fmt.Fprint(w, `{"error": "Error occured while decoding event data %s"}`, err)
 		return
 	}
