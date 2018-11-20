@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"../lib/persistence"
+	"../../lib/persistence"
 	"github.com/gorilla/mux"
 )
 

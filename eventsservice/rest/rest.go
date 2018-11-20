@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"github.com/gorilla/mux"
-	"../lib/persistence"
+	"../../lib/persistence"
 )
 
 func ServeAPI(endpoint string, tlsendpoint string, databasehandler persistence.DatabaseHandler) (chan error, chan error) {
