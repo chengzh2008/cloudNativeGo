@@ -8,3 +8,7 @@ type EventBookedEvent struct {
 func (c *EventBookedEvent) EventName() string {
 	return "event.booked"
 }
+
+func (c *EventBookedEvent) PartitionKey() string {
+	return c.EventID
+}

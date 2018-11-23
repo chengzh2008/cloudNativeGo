@@ -7,12 +7,14 @@ import (
 	"../persistence/dblayer"
 )
 
-const (
+var (
 	DBTypeDefault = dblayer.DBTYPE("mongodb")
 	DBConnectionDefault = "mongodb://127.0.0.1"
 	RestfulEPDefault = "localhost:8181"
 	RestfulTLSEPDefault = "localhost:9191"
+	MessageBrokerTypeDefault = "amqp"
 	AMQPMessageBrokerDefault = "amqp://guest:guest@localhost:5672"
+	KafkaMessageBrokersDefault = []string{"localhost:9092"}
 )
 
 // ServiceConfig model
@@ -21,7 +23,9 @@ type ServiceConfig struct {
 	DBConnection string `json:"dbconnection"`
 	RestfulEndpoint string `json:"restfulapi_endpoint"`
 	RestfulTLSEndpoint string `json:"restfulapi_tlsendpoint"`
+	MessageBrokerType string `json:"message_broker_type"`
 	AMQPMessageBroker string `json:"amqp_message_broker"`
+	KafkaMessageBrokers []string `json:"kafka_message_brokers"`
 }
 
 func ExtractConfiguration(filename string) (ServiceConfig, error) {
@@ -30,7 +34,9 @@ func ExtractConfiguration(filename string) (ServiceConfig, error) {
 		DBConnectionDefault,
 		RestfulEPDefault,
 		RestfulTLSEPDefault,
+		MessageBrokerTypeDefault,
 		AMQPMessageBrokerDefault,
+		KafkaMessageBrokersDefault,
 	}
 
 	file, err := os.Open(filename)
