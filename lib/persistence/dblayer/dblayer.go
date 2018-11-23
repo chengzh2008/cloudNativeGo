@@ -5,6 +5,7 @@ import (
 	"../mongolayer"
 )
 
+// DBTYPE string
 type DBTYPE string
 
 const (

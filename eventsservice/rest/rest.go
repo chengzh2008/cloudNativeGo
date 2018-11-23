@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"net/http"
 	"github.com/gorilla/mux"
+	"../../lib/msgqueue"
 	"../../lib/persistence"
 )
 
-func ServeAPI(endpoint string, tlsendpoint string, databasehandler persistence.DatabaseHandler) (chan error, chan error) {
-	handler := NewEventHandler(databasehandler)
+// function to start the restful service
+func ServeAPI(endpoint string, tlsendpoint string, databasehandler persistence.DatabaseHandler, eventEmitter msgqueue.EventEmitter) (chan error, chan error) {
+	handler := NewEventHandler(databasehandler, eventEmitter)
 	r := mux.NewRouter()
 	eventsrouter := r.PathPrefix("/events").Subrouter()
 	eventsrouter.Methods("GET").Path("/{searchCriteria}/{searchValue}").HandlerFunc(handler.FindEventHandler)

@@ -11,6 +11,7 @@ const (
 	DB = "myevents"
 	USERS = "users"
 	EVENTS = "events"
+	LOCATONS = "locations"
 )
 
 // MongoDBLayer that holds the session
@@ -66,4 +67,19 @@ func (mgoLayer *MongoDBLayer) FindAllAvailableEvents() ([]persistence.Event, err
 	fmt.Println("all events:")
 	fmt.Println(events)
 	return events, err
+}
+
+func (mgoLayer *MongoDBLayer) AddLocation(l persistence.Location) (persistence.Location, error) {
+	s := mgoLayer.getFreshSession()
+	defer s.Close()
+	l.ID = bson.NewObjectId()
+	err := s.DB(DB).C(LOCATONS).Insert(l)
+	return l, err
+}
+
+func (mgoLayer *MongoDBLayer) AddBookingForUser(id []byte, bk persistence.Booking) error {
+	s := mgoLayer.getFreshSession()
+	defer s.Close()
+	err := s.DB(DB).C(USERS).UpdateId(id, bson.M{"$addToSet": bson.M{"bookings": []persistence.Booking{bk}}})
+	return err
 }
