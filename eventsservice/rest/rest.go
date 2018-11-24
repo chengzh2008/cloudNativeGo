@@ -24,7 +24,7 @@ func ServeAPI(endpoint string, tlsendpoint string, databasehandler persistence.D
 		httpErrChan <- http.ListenAndServe(endpoint, r)
 	}()
 	go func() {
-		httpTLSErrChan <- http.ListenAndServeTLS(tlsendpoint, "./eventsservice/rest/cert.pem", "./eventsservice/rest/key.pem", r)
+		httpTLSErrChan <- http.ListenAndServeTLS(tlsendpoint, "./rest/cert.pem", "./rest/key.pem", r)
 	}()
 	return httpErrChan, httpTLSErrChan
 }
