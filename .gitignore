@@ -2,4 +2,5 @@ cloudNativeGo
 **/eventsservice
 **/bookingservice
 frontend/node_modules
+frontend/dist
 **/*/*.pem
