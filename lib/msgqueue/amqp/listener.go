@@ -20,8 +20,16 @@ func (a *amqpEventListener) setup() error {
 		return err
 	}
 	defer channel.Close()
+	err = channel.ExchangeDeclare(a.exchange, "topic", true, false, false, false, nil)
+	if err != nil {
+		return err
+	}
+
 	_, err = channel.QueueDeclare(a.queue, true, false, false, false, nil)
-	return err
+	if err != nil {
+		return fmt.Errorf("could not declare queue %s: %s", a.queue, err)
+	}
+	return nil
 }
 
 func NewAMQPEventListener(conn *amqp.Connection, exchange string, queue string) (msgqueue.EventListener, error) {
@@ -45,14 +53,14 @@ func (a *amqpEventListener) Listen(eventNames ...string) (<-chan msgqueue.Event,
 	}
 	defer channel.Close()
 	for _, eventName := range eventNames {
-		if err := channel.QueueBind(a.queue, eventName, "events", false, nil); err != nil {
-			return nil, nil, err
+		if err := channel.QueueBind(a.queue, eventName, a.exchange, false, nil); err != nil {
+			return nil, nil, fmt.Errorf("could not bind event %s to queue %s: %s", eventName, a.queue, err)
 		}
 	}
 
 	msgs, err := channel.Consume(a.queue, "", false, false, false, false, nil)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("could not consume queue: %s", err)
 	}
 
 	eventChan := make(chan msgqueue.Event)

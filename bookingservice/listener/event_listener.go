@@ -2,6 +2,7 @@ package listener
 
 import (
 	"log"
+	"fmt"
 	"../../contracts"
 	"../../lib/msgqueue"
 	"../../lib/persistence"
@@ -15,15 +16,18 @@ type EventProcessor struct {
 
 func (p *EventProcessor) ProcessEvents() error {
 	log.Println("Listening to events")
+	log.Println(p.EventListener)
 
 	received, errors, err := p.EventListener.Listen("event.created")
 	if err != nil {
+		log.Printf("error while start listening: %s", err)
 		return err
 	}
 
 	for {
 		select {
 		case evt := <-received:
+			fmt.Printf("got event %T: %s\n", evt, evt)
 			p.handleEvent(evt)
 		case err = <-errors:
 			log.Printf("received error while processing msg: %s", err)
@@ -32,6 +36,7 @@ func (p *EventProcessor) ProcessEvents() error {
 }
 
 func (p *EventProcessor) handleEvent(event msgqueue.Event) {
+	log.Printf("handling event: ")
 	switch e := event.(type) {
 	case *contracts.EventCreatedEvent:
 		log.Printf("event %s created: %s", e.ID, e)
