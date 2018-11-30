@@ -2,6 +2,7 @@ package configuration
 
 import (
 	"encoding/json"
+	"strings"
 	"fmt"
 	"os"
 	"../persistence/dblayer"
@@ -42,11 +43,27 @@ func ExtractConfiguration(filename string) (ServiceConfig, error) {
 	file, err := os.Open(filename)
 	if err != nil {
 		fmt.Println("Configuration file not found. Continuing with default values.")
-		return conf, err
+		// return conf, err
 	}
-	err = json.NewDecoder(file).Decode(&conf)
-	if broker := os.Getenv("AMQP_URL"); broker != "" {
-		conf.AMQPMessageBroker = broker
+
+	json.NewDecoder(file).Decode(&conf)
+
+	if v := os.Getenv("LISTEN_URL"); v != "" {
+		conf.RestfulEndpoint = v
 	}
-	return conf, err
+
+	if v := os.Getenv("MONGO_URL"); v != "" {
+		conf.Databasetype = "mongodb"
+		conf.DBConnection = v
+	}
+
+	if v := os.Getenv("AMQP_BROKER_URL"); v != "" {
+		conf.MessageBrokerType = "amqp"
+		conf.AMQPMessageBroker = v
+	} else if v := os.Getenv("KAFKA_BROKER_URLS"); v != "" {
+		conf.MessageBrokerType = "kafka"
+		conf.KafkaMessageBrokers = strings.Split(v, ",")
+	}
+
+	return conf, nil
 }
